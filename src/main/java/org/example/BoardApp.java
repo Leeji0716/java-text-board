@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.PrimitiveIterator;
 import java.util.Scanner;
 
+
 class BoardManager {
     private ArrayList<Post> postList;
     private int count;
@@ -38,9 +39,14 @@ class BoardManager {
                  return; // 삭제 완료 후 메서드 종료
              }
          }
-         System.out.println("존재하지 않는 게시물 번호입니다.-delete");
+         System.out.println("존재하지 않는 게시물 번호입니다.");
      }
-     public void showPost(Post post){
+     public void listPost(Post post){
+         System.out.println("번호 : " + post.getNumber());
+         System.out.println("제목 : " + post.getTitle());
+         System.out.println("========================");
+     }
+     public void detailPost(Post post){
         //시간 형식화
         LocalDateTime currentDateTime = post.getDateTime();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -51,7 +57,17 @@ class BoardManager {
         System.out.println("제목 : " + post.getTitle());
         System.out.println("내용 : " + post.getBody());
         System.out.println("등록 날짜 : " + formattedDateTime);
+        System.out.println("조회수 : " + post.getView());
         System.out.println("========================");
+
+     }
+     public void searchTitle(String keyword){
+        for(int i = 0; i <postList.size(); i++){
+            if (postList.get(i).getTitle().contains(keyword)){
+                listPost(postList.get(i));
+            }
+        }
+         System.out.println("검색 결과가 없습니다.");
      }
 }
 class Post {
@@ -59,6 +75,7 @@ class Post {
     private String title;
     private String body;
     private LocalDateTime dateTime;
+    private int view = 1;
 
     public Post(int number, String title, String body, LocalDateTime dateTime){ //post 생성
         this.number = number;
@@ -93,6 +110,14 @@ class Post {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public int getView() {
+        return view++;
+    }
+
+    public void setView(int view) {
+        this.view = view;
     }
 }
 public class BoardApp {
@@ -129,9 +154,7 @@ public class BoardApp {
                 System.out.println("========================");
                 List<Post> posts = boardManager.getPostList(); //Post의 리스트를 가져온다.
                 for (Post post : posts) {
-                    System.out.println("번호 : " + post.getNumber());
-                    System.out.println("제목 : " + post.getTitle());
-                    System.out.println("========================");
+                    boardManager.listPost(post);
                 }
             }
             else if (cmd.equals("update")) {
@@ -177,10 +200,15 @@ public class BoardApp {
                     }
                 }
                 if (postNum) {
-                    boardManager.showPost(indexPost);
+                    boardManager.detailPost(indexPost);
                 } else {
                     System.out.println("존재하지 않는 게시물입니다.");
                 }
+            }
+            else if (cmd.equals("search")){
+                System.out.print("검색 키워드를 입력해주세요. : ");
+                String Keyword = scan.nextLine();
+                boardManager.searchTitle(Keyword);
             }
         }
     }
