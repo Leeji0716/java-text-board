@@ -1,6 +1,4 @@
 package org.example;
-
-
 import java.security.PrivateKey;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -8,30 +6,33 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.PrimitiveIterator;
 import java.util.Scanner;
-
-
 class BoardManager {
     private ArrayList<Post> postList;
     private int count;
-
+    private ArrayList<DetailComment> detailList;
+    private int good = 0;
     public BoardManager(){
         postList = new ArrayList<>();
+        detailList = new ArrayList<>();
         count = 0;
     }
      public void addPost(String title, String body){ //Post 생성
         count++;
-        postList.add(new Post(count, title, body, LocalDateTime.now())); //고유번호와 제목, 내용, 입력시간으로 새 Post를 생성
+        postList.add(new Post(count, title, body, LocalDateTime.now()));
      }
      public List<Post> getPostList(){
         return postList;
+     }
+     public ArrayList<DetailComment> getDetailList() {
+        return detailList;
      }
      public void updatePost(Post post, String title, String body){
         post.setTitle(title);
         post.setBody(body);
         post.setDateTime(LocalDateTime.now());
         System.out.println(post.getNumber() + "번 게시물이 수정되었습니다.");
-     }
-     public void deletePost(int postNumber){
+    }
+    public void deletePost(int postNumber){
          for (int i = 0; i < postList.size(); i++) {
              if (postList.get(i).getNumber() == postNumber) {
                  postList.remove(i);
@@ -40,13 +41,14 @@ class BoardManager {
              }
          }
          System.out.println("존재하지 않는 게시물 번호입니다.");
-     }
-     public void listPost(Post post){
+    }
+    public void listPost(Post post){
          System.out.println("번호 : " + post.getNumber());
          System.out.println("제목 : " + post.getTitle());
          System.out.println("========================");
-     }
-     public void detailPost(Post post){
+    }
+    public void detailPost(Post post){
+        Scanner scan = new Scanner(System.in);
         //시간 형식화
         LocalDateTime currentDateTime = post.getDateTime();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -60,15 +62,83 @@ class BoardManager {
         System.out.println("조회수 : " + post.getView());
         System.out.println("========================");
 
-     }
-     public void searchTitle(String keyword){
-        for(int i = 0; i <postList.size(); i++){
+        while(true) {
+            System.out.print("상세보기 기능을 선택해주세요(1. 댓글 등록, 2. 추천, 3. 수정, 4. 삭제, 5. 목록으로) : ");
+            String detailNum = scan.nextLine();
+            if (detailNum.equals("1")){
+                System.out.print("댓글 달기 : ");
+                String comment = scan.nextLine();
+                detailList.add(new DetailComment(comment, LocalDateTime.now()));
+
+                System.out.println("========================");
+                System.out.println("번호 : " + post.getNumber());
+                System.out.println("제목 : " + post.getTitle());
+                System.out.println("내용 : " + post.getBody());
+                System.out.println("등록 날짜 : " + formattedDateTime);
+                System.out.println("조회수 : " + post.getView());
+                System.out.println("========================");
+                for (int i = 0; i < detailList.size(); i++) {
+                    LocalDateTime commentTime = detailList.get(i).getCommentTime();
+                    DateTimeFormatter formatterDe = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    String formattedDeTime = commentTime.format(formatterDe);
+
+                    System.out.println("===========댓글==========");
+                    System.out.println(detailList.get(i).getComment());
+                    System.out.println(formattedDeTime);
+                    System.out.println("========================");
+                }
+            }
+            else if (detailNum.equals("2")){
+                good++;
+                System.out.println("추천 갯수 : " + good);
+            }
+            else if (detailNum.equals("3")){
+                System.out.println("수정");
+            }
+            else if (detailNum.equals("4")){
+                System.out.println("삭제");
+            }
+            else if (detailNum.equals("5")){
+                System.out.println("상세보기 화면을 빠져나갑니다.");
+                break;
+            }
+        }
+
+
+    }
+    public void searchTitle(String keyword){
+        for(int i = 0; i < postList.size(); i++){
             if (postList.get(i).getTitle().contains(keyword)){
                 listPost(postList.get(i));
             }
         }
          System.out.println("검색 결과가 없습니다.");
-     }
+    }
+}
+class DetailComment {
+    private String Comment;
+    private LocalDateTime CommentTime;
+
+    public DetailComment(String comment, LocalDateTime commentTime){
+        this.Comment = comment;
+        this.CommentTime = commentTime;
+    }
+
+    public String getComment() {
+        return Comment;
+    }
+
+    public void setComment(String comment) {
+        Comment = comment;
+    }
+
+    public LocalDateTime getCommentTime() {
+        return CommentTime;
+    }
+
+    public void setCommentTime(LocalDateTime commentTime) {
+        CommentTime = commentTime;
+    }
 }
 class Post {
     private int number;
@@ -140,15 +210,12 @@ public class BoardApp {
                 break; //반복문 탈출
             }
             else if (cmd.equals("add")) {
-                System.out.print("제목을 입력하세요 : "); //제목 입력받음
+                System.out.print("제목을 입력하세요 : ");
                 String title = scan.nextLine();
-
-                System.out.print("내용을 입력하세요 : "); //내용 입력받음
+                System.out.print("내용을 입력하세요 : ");
                 String body = scan.nextLine();
-
-                boardManager.addPost(title, body); //제목과 내용을 입력받고 boardManager에게 addPost작업을 시킴
-
-                System.out.println("게시물이 등록되었습니다."); //게시물 등록
+                boardManager.addPost(title, body);
+                System.out.println("게시물이 등록되었습니다.");
             }
             else if (cmd.equals("list")) {
                 System.out.println("========================");
