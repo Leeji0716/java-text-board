@@ -13,7 +13,6 @@ class BoardManager {
     private int good = 0;
     public BoardManager(){
         postList = new ArrayList<>();
-
         count = 0;
     }
      public void addPost(String title, String body){ //Post 생성
@@ -191,9 +190,9 @@ public class BoardApp {
         BoardManager boardManager = new BoardManager();
 
         //Test Data
-        boardManager.addPost("안녕하세요. 반갑습니다. 자바 공부중이에요.", "body1");
-        boardManager.addPost("자바 질문좀 할게요~", "body2");
-        boardManager.addPost("정처기 따야 하나요?", "body3");
+//        boardManager.addPost("안녕하세요. 반갑습니다. 자바 공부중이에요.", "body1");
+//        boardManager.addPost("자바 질문좀 할게요~", "body2");
+//        boardManager.addPost("정처기 따야 하나요?", "body3");
 
         //반복 횟수를 정할 수 없음. => 무한 반복 (while) 구조
         while(true) { //반복 조건이 true이기 때문에 무한 반복 구조
