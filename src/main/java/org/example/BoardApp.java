@@ -1,4 +1,5 @@
 package org.example;
+import javax.xml.stream.events.Comment;
 import java.security.PrivateKey;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -9,11 +10,10 @@ import java.util.Scanner;
 class BoardManager {
     private ArrayList<Post> postList;
     private int count;
-    private ArrayList<DetailComment> detailList;
     private int good = 0;
     public BoardManager(){
         postList = new ArrayList<>();
-        detailList = new ArrayList<>();
+
         count = 0;
     }
      public void addPost(String title, String body){ //Post 생성
@@ -22,9 +22,6 @@ class BoardManager {
      }
      public List<Post> getPostList(){
         return postList;
-     }
-     public ArrayList<DetailComment> getDetailList() {
-        return detailList;
      }
      public void updatePost(Post post, String title, String body){
         post.setTitle(title);
@@ -68,7 +65,7 @@ class BoardManager {
             if (detailNum.equals("1")){
                 System.out.print("댓글 달기 : ");
                 String comment = scan.nextLine();
-                detailList.add(new DetailComment(comment, LocalDateTime.now()));
+                post.Comment(comment, LocalDateTime.now());
 
                 System.out.println("========================");
                 System.out.println("번호 : " + post.getNumber());
@@ -77,13 +74,13 @@ class BoardManager {
                 System.out.println("등록 날짜 : " + formattedDateTime);
                 System.out.println("조회수 : " + post.getView());
                 System.out.println("========================");
-                for (int i = 0; i < detailList.size(); i++) {
-                    LocalDateTime commentTime = detailList.get(i).getCommentTime();
+
+                for(int i = 0; i < post.getComment().size(); i++){
+                    LocalDateTime commentTime = post.getCommentTime().get(i);
                     DateTimeFormatter formatterDe = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                     String formattedDeTime = commentTime.format(formatterDe);
-
                     System.out.println("===========댓글==========");
-                    System.out.println(detailList.get(i).getComment());
+                    System.out.println(post.getComment().get(i));
                     System.out.println(formattedDeTime);
                     System.out.println("========================");
                 }
@@ -103,8 +100,6 @@ class BoardManager {
                 break;
             }
         }
-
-
     }
     public void searchTitle(String keyword){
         for(int i = 0; i < postList.size(); i++){
@@ -115,31 +110,6 @@ class BoardManager {
          System.out.println("검색 결과가 없습니다.");
     }
 }
-class DetailComment {
-    private String Comment;
-    private LocalDateTime CommentTime;
-
-    public DetailComment(String comment, LocalDateTime commentTime){
-        this.Comment = comment;
-        this.CommentTime = commentTime;
-    }
-
-    public String getComment() {
-        return Comment;
-    }
-
-    public void setComment(String comment) {
-        Comment = comment;
-    }
-
-    public LocalDateTime getCommentTime() {
-        return CommentTime;
-    }
-
-    public void setCommentTime(LocalDateTime commentTime) {
-        CommentTime = commentTime;
-    }
-}
 class Post {
     private int number;
     private String title;
@@ -147,15 +117,40 @@ class Post {
     private LocalDateTime dateTime;
     private int view = 1;
 
+    public ArrayList<LocalDateTime> getCommentTime() {
+        return commentTime;
+    }
+
+    public void setCommentTime(ArrayList<LocalDateTime> commentTime) {
+        this.commentTime = commentTime;
+    }
+
+    public ArrayList<String> getComment() {
+        return comment;
+    }
+
+    public void setComment(ArrayList<String> comment) {
+        this.comment = comment;
+    }
+
+    ArrayList<String> comment = new ArrayList<>();
+    ArrayList<LocalDateTime> commentTime = new ArrayList<>();
     public Post(int number, String title, String body, LocalDateTime dateTime){ //post 생성
         this.number = number;
         this.title = title;
         this.body = body;
         this.dateTime = dateTime;
     }
-
+    public void Comment(String comment, LocalDateTime commentTime){
+        this.comment.add(comment);
+        this.commentTime.add(commentTime);
+    }
     public int getNumber() {
         return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
     }
 
     public String getTitle() {
