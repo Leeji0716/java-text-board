@@ -17,17 +17,21 @@ class BoardManager {
         personList = new ArrayList<>();
         count = 0;
     }
-     public void addPost(String title, String body){ //Post 생성
+    public void addPost(String title, String body){
         count++;
         postList.add(new Post(count, title, body, LocalDateTime.now()));
-     }
+     } //Manager Post 생성
+    public void addPost(String title, String body, Person person){ //회원 Post 생성
+        count++;
+        postList.add(new Post(count, title, body, LocalDateTime.now(), person));
+    } //Post 생성
     public void addPerson(String id, String password, String name) {
         personList.add(new Person(id, password, name));
     }
-     public List<Post> getPostList(){
+    public List<Post> getPostList(){
         return postList;
-     }
-     public void updatePost(Post post, String title, String body){
+    }
+    public void updatePost(Post post, String title, String body){
         post.setTitle(title);
         post.setBody(body);
         post.setDateTime(LocalDateTime.now());
@@ -61,12 +65,12 @@ class BoardManager {
     public void detailPost(Post post){
         showpost(post);
         showcomment(post);
-    }
+    } //비회원 detailpost
     public void logDetailPost(Post post){
         showpost(post);
         showcomment(post);
         viewdetail(post);
-    }
+    } //회원 detailpost
     public void viewdetail(Post post){
         Scanner scan = new Scanner(System.in);
         while(true) {
@@ -95,7 +99,7 @@ class BoardManager {
                 break;
             }
         }
-    }
+    } //상세보기 - 회원기능
     public void showpost(Post post) {
         LocalDateTime currentDateTime = post.getDateTime();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss");
@@ -106,8 +110,9 @@ class BoardManager {
         System.out.println("내용 : " + post.getBody());
         System.out.println("등록 날짜 : " + formattedDateTime);
         System.out.println("조회수 : " + post.getView());
+        System.out.println("작성자 : " + post.getNickName());
         System.out.println("========================");
-    }
+    } //post 보여주기
     public void showcomment(Post post) {
         for(int i = 0; i < post.getComment().size(); i++){
             LocalDateTime commentTime = post.getCommentTime().get(i);
@@ -118,7 +123,7 @@ class BoardManager {
             System.out.println(formattedDeTime);
             System.out.println("========================");
         }
-    }
+    } //comment 보여주기
     public void searchTitle(String keyword){
         for(int i = 0; i < postList.size(); i++){
             if (postList.get(i).getTitle().contains(keyword)){
@@ -172,6 +177,7 @@ class Post {
     private String body;
     private LocalDateTime dateTime;
     private int view = 1;
+    private String nickName = "";
 
     public ArrayList<LocalDateTime> getCommentTime() {
         return commentTime;
@@ -191,12 +197,28 @@ class Post {
 
     ArrayList<String> comment = new ArrayList<>();
     ArrayList<LocalDateTime> commentTime = new ArrayList<>();
-    public Post(int number, String title, String body, LocalDateTime dateTime){ //post 생성
+    public Post(int number, String title, String body, LocalDateTime dateTime){
         this.number = number;
         this.title = title;
         this.body = body;
         this.dateTime = dateTime;
+    } //post 생성
+
+    public String getNickName() {
+        return nickName;
     }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    public Post(int number, String title, String body, LocalDateTime dateTime, Person person){
+        this.number = number;
+        this.title = title;
+        this.body = body;
+        this.dateTime = dateTime;
+        this.nickName = person.getName();
+    } //회원 post 생성
     public void Comment(String comment, LocalDateTime commentTime){
         this.comment.add(comment);
         this.commentTime.add(commentTime);
@@ -242,11 +264,9 @@ class Post {
     }
 }
 public class BoardApp {
-    boolean login = false;
+    Scanner scan = new Scanner(System.in);
+    BoardManager boardManager = new BoardManager();
     public void run(){
-        Scanner scan = new Scanner(System.in);
-        BoardManager boardManager = new BoardManager();
-
         //Test Data
         boardManager.addPost("안녕하세요. 반갑습니다. 자바 공부중이에요.", "body1");
         boardManager.addPost("자바 질문좀 할게요~", "body2");
@@ -261,10 +281,14 @@ public class BoardApp {
                 break;
             }
             else if (cmd.equals("add")) {
-                System.out.println("로그인 후 이용해 주세요.");
+                if(log인여부){
+                    add(person가 작성);
+                }else {
+                    System.out.println("로그인 후 이용해 주세요.");
+                }
             }
             else if (cmd.equals("list")) {
-                boardManager.listPost();
+                list();
             }
             else if (cmd.equals("update")) {
                 System.out.println("로그인 후 이용해 주세요.");
@@ -273,45 +297,74 @@ public class BoardApp {
                 System.out.println("로그인 후 이용해 주세요.");
             }
             else if (cmd.equals("detail")) {
-                System.out.print("상세보기 할 게시물 번호 : ");
-                int num = Integer.parseInt(scan.nextLine());
-                boardManager.indexPost(num);
+                detail();
             }
             else if (cmd.equals("search")){
-                System.out.print("검색 키워드를 입력해주세요. : ");
-                String Keyword = scan.nextLine();
-                boardManager.searchTitle(Keyword);
+                search();
             }
             else if (cmd.equals("signup")){
-                System.out.println("==== 회원 가입을 진행합니다. ====");
-                System.out.print("아이디를 입력해주세요 : ");
-                String id = scan.nextLine();
-                System.out.print("비밀번호를 입력해주세요 : ");
-                String password = scan.nextLine();
-                System.out.print("닉네임을 입력해주세요 : ");
-                String name = scan.nextLine();
-                boardManager.addPerson(id, password, name);
-                System.out.println("=== 회원 가입이 완료되었습니다. ===");
+                signup();
             }
             else if (cmd.equals("login")){
-                System.out.print("아이디 : ");
-                String id = scan.nextLine();
-                System.out.print("비밀번호 : ");
-                String password = scan.nextLine();
-                Person logInPerson = boardManager.login(id, password);
-                if (logInPerson != null) {
-                    logrun(logInPerson);
-                } else {
-                    System.out.println("로그인에 실패했습니다.");
-                }
-                break; //login성공시 run()에서 나감
+                logIn();
             }
             else{
                 System.out.println("올바른 명령어를 입력해주세요 : ");
             }
         }
+    } //비회원 상태일 때 작동
+
+    private void add() {
+        System.out.print("제목을 입력하세요 : ");
+        String title = scan.nextLine();
+        System.out.print("내용을 입력하세요 : ");
+        String body = scan.nextLine();
+        boardManager.addPost(title, body, person);
+        System.out.println("게시물이 등록되었습니다.");
     }
-    public void logrun(Person person){
+
+    private void list() {
+        boardManager.listPost();
+    }
+
+    private void detail() {
+        System.out.print("상세보기 할 게시물 번호 : ");
+        int num = Integer.parseInt(scan.nextLine());
+        boardManager.indexPost(num);
+    }
+
+    private void search() {
+        System.out.print("검색 키워드를 입력해주세요. : ");
+        String Keyword = scan.nextLine();
+        boardManager.searchTitle(Keyword);
+    }
+
+    private void logIn() {
+        System.out.print("아이디 : ");
+        String id = scan.nextLine();
+        System.out.print("비밀번호 : ");
+        String password = scan.nextLine();
+        Person logInPerson = boardManager.login(id, password);
+        if (logInPerson != null) {
+            logrun(logInPerson);
+        } else {
+            System.out.println("로그인에 실패했습니다.");
+        }
+    }
+
+    private void signup() {
+        System.out.println("==== 회원 가입을 진행합니다. ====");
+        System.out.print("아이디를 입력해주세요 : ");
+        String id = scan.nextLine();
+        System.out.print("비밀번호를 입력해주세요 : ");
+        String password = scan.nextLine();
+        System.out.print("닉네임을 입력해주세요 : ");
+        String name = scan.nextLine();
+        boardManager.addPerson(id, password, name);
+        System.out.println("=== 회원 가입이 완료되었습니다. ===");
+    }
+
+    public void logrun(Person person){ //회원 상태일 때 작동
         Scanner scan = new Scanner(System.in);
         BoardManager boardManager = new BoardManager();
 
@@ -323,15 +376,10 @@ public class BoardApp {
                 break;
             }
             else if (cmd.equals("add")) {
-                System.out.print("제목을 입력하세요 : ");
-                String title = scan.nextLine();
-                System.out.print("내용을 입력하세요 : ");
-                String body = scan.nextLine();
-                boardManager.addPost(title, body);
-                System.out.println("게시물이 등록되었습니다.");
+
             }
             else if (cmd.equals("list")) {
-                boardManager.listPost();
+                list();
             }
             else if (cmd.equals("update")) {
                 Post indexPost = null;
@@ -358,9 +406,7 @@ public class BoardApp {
                 }
             }
             else if (cmd.equals("delete")) {
-                System.out.print("삭제할 게시물 번호 : ");
-                int num = Integer.parseInt(scan.nextLine());
-                boardManager.deletePost(num);
+                delete();
             }
             else if (cmd.equals("detail")) {
                 System.out.print("상세보기 할 게시물 번호 : ");
@@ -377,5 +423,11 @@ public class BoardApp {
             }
         }
 
+    }
+
+    private void delete() {
+        System.out.print("삭제할 게시물 번호 : ");
+        int num = Integer.parseInt(scan.nextLine());
+        boardManager.deletePost(num);
     }
 }
