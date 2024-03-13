@@ -13,7 +13,7 @@ public class Main {
             String cmd = scan.nextLine();
 
             if(cmd.equals("signup")){
-                System.out.println("==== 회원 가입을 진행합니다. ====");
+                System.out.println("==== 회원 가입을 진행합니 다. ====");
                 System.out.print("아이디를 입력해주세요 : ");
                 String id = scan.nextLine();
                 System.out.print("비밀번호를 입력해주세요 : ");
