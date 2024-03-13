@@ -44,20 +44,12 @@ class BoardManager {
          System.out.println("========================");
     }
     public void detailPost(Post post){
+        showpost(post);
+        showcomment(post);
+        viewdetail(post);
+    }
+    public void viewdetail(Post post){
         Scanner scan = new Scanner(System.in);
-        //시간 형식화
-        LocalDateTime currentDateTime = post.getDateTime();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedDateTime = currentDateTime.format(formatter);
-
-        System.out.println("========================");
-        System.out.println("번호 : " + post.getNumber());
-        System.out.println("제목 : " + post.getTitle());
-        System.out.println("내용 : " + post.getBody());
-        System.out.println("등록 날짜 : " + formattedDateTime);
-        System.out.println("조회수 : " + post.getView());
-        System.out.println("========================");
-
         while(true) {
             System.out.print("상세보기 기능을 선택해주세요(1. 댓글 등록, 2. 추천, 3. 수정, 4. 삭제, 5. 목록으로) : ");
             String detailNum = scan.nextLine();
@@ -66,23 +58,8 @@ class BoardManager {
                 String comment = scan.nextLine();
                 post.Comment(comment, LocalDateTime.now());
 
-                System.out.println("========================");
-                System.out.println("번호 : " + post.getNumber());
-                System.out.println("제목 : " + post.getTitle());
-                System.out.println("내용 : " + post.getBody());
-                System.out.println("등록 날짜 : " + formattedDateTime);
-                System.out.println("조회수 : " + post.getView());
-                System.out.println("========================");
-
-                for(int i = 0; i < post.getComment().size(); i++){
-                    LocalDateTime commentTime = post.getCommentTime().get(i);
-                    DateTimeFormatter formatterDe = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                    String formattedDeTime = commentTime.format(formatterDe);
-                    System.out.println("===========댓글==========");
-                    System.out.println(post.getComment().get(i));
-                    System.out.println(formattedDeTime);
-                    System.out.println("========================");
-                }
+                showpost(post);
+                showcomment(post);
             }
             else if (detailNum.equals("2")){
                 good++;
@@ -98,6 +75,29 @@ class BoardManager {
                 System.out.println("상세보기 화면을 빠져나갑니다.");
                 break;
             }
+        }
+    }
+    public void showpost(Post post) {
+        LocalDateTime currentDateTime = post.getDateTime();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss");
+        String formattedDateTime = currentDateTime.format(formatter);
+        System.out.println("========================");
+        System.out.println("번호 : " + post.getNumber());
+        System.out.println("제목 : " + post.getTitle());
+        System.out.println("내용 : " + post.getBody());
+        System.out.println("등록 날짜 : " + formattedDateTime);
+        System.out.println("조회수 : " + post.getView());
+        System.out.println("========================");
+    }
+    public void showcomment(Post post) {
+        for(int i = 0; i < post.getComment().size(); i++){
+            LocalDateTime commentTime = post.getCommentTime().get(i);
+            DateTimeFormatter formatterDe = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss");
+            String formattedDeTime = commentTime.format(formatterDe);
+            System.out.println("===========댓글==========");
+            System.out.println(post.getComment().get(i));
+            System.out.println(formattedDeTime);
+            System.out.println("========================");
         }
     }
     public void searchTitle(String keyword){
@@ -185,23 +185,23 @@ class Post {
     }
 }
 public class BoardApp {
-    public void run(){
+    boolean run = false;
+    public void run(Person person){
         Scanner scan = new Scanner(System.in);
         BoardManager boardManager = new BoardManager();
+        run = true;
 
         //Test Data
-//        boardManager.addPost("안녕하세요. 반갑습니다. 자바 공부중이에요.", "body1");
-//        boardManager.addPost("자바 질문좀 할게요~", "body2");
-//        boardManager.addPost("정처기 따야 하나요?", "body3");
+        boardManager.addPost("안녕하세요. 반갑습니다. 자바 공부중이에요.", "body1");
+        boardManager.addPost("자바 질문좀 할게요~", "body2");
+        boardManager.addPost("정처기 따야 하나요?", "body3");
 
-        //반복 횟수를 정할 수 없음. => 무한 반복 (while) 구조
-        while(true) { //반복 조건이 true이기 때문에 무한 반복 구조
-            System.out.print("명령어 : ");
+        while(true) {
+            System.out.print("명령어를 입력해주세요[" + person.getId() + "(" + person.getName() + ")] : ");
             String cmd = scan.nextLine();
-
-            if (cmd.equals("exit")) { //숫자가 아닌 경우 같다라는 표현 사용 시, ==이 아닌 .equals를 사용
-                System.out.println("프로그램을 종료합니다.");
-                break; //반복문 탈출
+            if (cmd.equals("exit")) {
+                System.out.println("로그아웃 합니다.");
+                break;
             }
             else if (cmd.equals("add")) {
                 System.out.print("제목을 입력하세요 : ");
@@ -254,7 +254,7 @@ public class BoardApp {
                 int num = Integer.parseInt(scan.nextLine());
                 List<Post> posts = boardManager.getPostList();
 
-                for (Post post : posts) {
+                for (Post post : posts) { //번호가 있는지 확인
                     if (num == post.getNumber()) {
                         indexPost = post;
                         postNum = true;
