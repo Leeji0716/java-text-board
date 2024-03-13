@@ -9,16 +9,21 @@ import java.util.PrimitiveIterator;
 import java.util.Scanner;
 class BoardManager {
     private ArrayList<Post> postList;
+    private ArrayList<Person> personList;
     private int count;
     private int good = 0;
     public BoardManager(){
         postList = new ArrayList<>();
+        personList = new ArrayList<>();
         count = 0;
     }
      public void addPost(String title, String body){ //Post 생성
         count++;
         postList.add(new Post(count, title, body, LocalDateTime.now()));
      }
+    public void addPerson(String id, String password, String name) {
+        personList.add(new Person(id, password, name));
+    }
      public List<Post> getPostList(){
         return postList;
      }
@@ -38,12 +43,26 @@ class BoardManager {
          }
          System.out.println("존재하지 않는 게시물 번호입니다.");
     }
+    public void listPost(){
+        System.out.println("========================");
+        List<Post> posts = getPostList();
+        for (Post post : posts) {
+            System.out.println("번호 : " + post.getNumber());
+            System.out.println("제목 : " + post.getTitle());
+            System.out.println("========================");
+        }
+    }
     public void listPost(Post post){
-         System.out.println("번호 : " + post.getNumber());
-         System.out.println("제목 : " + post.getTitle());
-         System.out.println("========================");
+        System.out.println("========================");
+        System.out.println("번호 : " + post.getNumber());
+        System.out.println("제목 : " + post.getTitle());
+        System.out.println("========================");
     }
     public void detailPost(Post post){
+        showpost(post);
+        showcomment(post);
+    }
+    public void logDetailPost(Post post){
         showpost(post);
         showcomment(post);
         viewdetail(post);
@@ -107,6 +126,44 @@ class BoardManager {
             }
         }
          System.out.println("검색 결과가 없습니다.");
+    }
+    public void indexPost(int num){
+        List<Post> posts = getPostList();
+        for (Post post : posts) { //번호가 있는지 확인
+            if (num == post.getNumber()) {
+                detailPost(post);
+                break;
+            }
+            System.out.println("존재하지 않는 게시물입니다.");
+            break;
+        }
+    }
+    public void logIndexPost(int num){
+        List<Post> posts = getPostList();
+        for (Post post : posts) { //번호가 있는지 확인
+            if (num == post.getNumber()) {
+                logDetailPost(post);
+                break;
+            }
+            System.out.println("존재하지 않는 게시물입니다.");
+            break;
+        }
+    }
+    public Person login(String id, String password) {
+        boolean loggedIn = false; // 로그인 여부를 나타내는 변수
+        for (int i = 0; i < personList.size(); i++) {
+            Person person = personList.get(i);
+            if (person.getId().equals(id) && person.getPassword().equals(password)) {
+                System.out.println(person.getName() + "님 환영합니다!");
+                loggedIn = true;
+                person.setSign(loggedIn);
+                return person;
+            }
+        }
+        if (!loggedIn) {
+            System.out.println("잘못된 회원 정보입니다.");
+        }
+        return null;
     }
 }
 class Post {
@@ -185,11 +242,10 @@ class Post {
     }
 }
 public class BoardApp {
-    boolean run = false;
-    public void run(Person person){
+    boolean login = false;
+    public void run(){
         Scanner scan = new Scanner(System.in);
         BoardManager boardManager = new BoardManager();
-        run = true;
 
         //Test Data
         boardManager.addPost("안녕하세요. 반갑습니다. 자바 공부중이에요.", "body1");
@@ -197,10 +253,73 @@ public class BoardApp {
         boardManager.addPost("정처기 따야 하나요?", "body3");
 
         while(true) {
+            System.out.print("명령어를 입력해주세요 : ");
+            String cmd = scan.nextLine();
+
+            if (cmd.equals("exit")) {
+                System.out.println("프로그램이 종료됩니다.");
+                break;
+            }
+            else if (cmd.equals("add")) {
+                System.out.println("로그인 후 이용해 주세요.");
+            }
+            else if (cmd.equals("list")) {
+                boardManager.listPost();
+            }
+            else if (cmd.equals("update")) {
+                System.out.println("로그인 후 이용해 주세요.");
+            }
+            else if (cmd.equals("delete")) {
+                System.out.println("로그인 후 이용해 주세요.");
+            }
+            else if (cmd.equals("detail")) {
+                System.out.print("상세보기 할 게시물 번호 : ");
+                int num = Integer.parseInt(scan.nextLine());
+                boardManager.indexPost(num);
+            }
+            else if (cmd.equals("search")){
+                System.out.print("검색 키워드를 입력해주세요. : ");
+                String Keyword = scan.nextLine();
+                boardManager.searchTitle(Keyword);
+            }
+            else if (cmd.equals("signup")){
+                System.out.println("==== 회원 가입을 진행합니다. ====");
+                System.out.print("아이디를 입력해주세요 : ");
+                String id = scan.nextLine();
+                System.out.print("비밀번호를 입력해주세요 : ");
+                String password = scan.nextLine();
+                System.out.print("닉네임을 입력해주세요 : ");
+                String name = scan.nextLine();
+                boardManager.addPerson(id, password, name);
+                System.out.println("=== 회원 가입이 완료되었습니다. ===");
+            }
+            else if (cmd.equals("login")){
+                System.out.print("아이디 : ");
+                String id = scan.nextLine();
+                System.out.print("비밀번호 : ");
+                String password = scan.nextLine();
+                Person logInPerson = boardManager.login(id, password);
+                if (logInPerson != null) {
+                    logrun(logInPerson);
+                } else {
+                    System.out.println("로그인에 실패했습니다.");
+                }
+                break; //login성공시 run()에서 나감
+            }
+            else{
+                System.out.println("올바른 명령어를 입력해주세요 : ");
+            }
+        }
+    }
+    public void logrun(Person person){
+        Scanner scan = new Scanner(System.in);
+        BoardManager boardManager = new BoardManager();
+
+        while(true) {
             System.out.print("명령어를 입력해주세요[" + person.getId() + "(" + person.getName() + ")] : ");
             String cmd = scan.nextLine();
             if (cmd.equals("exit")) {
-                System.out.println("로그아웃 합니다.");
+                System.out.println("프로그램이 종료됩니다.");
                 break;
             }
             else if (cmd.equals("add")) {
@@ -212,11 +331,7 @@ public class BoardApp {
                 System.out.println("게시물이 등록되었습니다.");
             }
             else if (cmd.equals("list")) {
-                System.out.println("========================");
-                List<Post> posts = boardManager.getPostList(); //Post의 리스트를 가져온다.
-                for (Post post : posts) {
-                    boardManager.listPost(post);
-                }
+                boardManager.listPost();
             }
             else if (cmd.equals("update")) {
                 Post indexPost = null;
@@ -248,29 +363,19 @@ public class BoardApp {
                 boardManager.deletePost(num);
             }
             else if (cmd.equals("detail")) {
-                Post indexPost = null;
-                boolean postNum = false;
                 System.out.print("상세보기 할 게시물 번호 : ");
                 int num = Integer.parseInt(scan.nextLine());
-                List<Post> posts = boardManager.getPostList();
-
-                for (Post post : posts) { //번호가 있는지 확인
-                    if (num == post.getNumber()) {
-                        indexPost = post;
-                        postNum = true;
-                    }
-                }
-                if (postNum) {
-                    boardManager.detailPost(indexPost);
-                } else {
-                    System.out.println("존재하지 않는 게시물입니다.");
-                }
+                boardManager.logIndexPost(num);
             }
             else if (cmd.equals("search")){
                 System.out.print("검색 키워드를 입력해주세요. : ");
                 String Keyword = scan.nextLine();
                 boardManager.searchTitle(Keyword);
             }
+            else{
+                System.out.println("올바른 명령어를 입력해주세요 : ");
+            }
         }
+
     }
 }

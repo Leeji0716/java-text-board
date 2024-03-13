@@ -6,8 +6,8 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Signup sign = new Signup();
-        sign.run();
+        BoardApp app = new BoardApp();
+        app.run();
     }
 }
 
