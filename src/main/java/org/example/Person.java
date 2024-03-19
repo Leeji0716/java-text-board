@@ -39,8 +39,16 @@ public class Person {
     public void setId(String id) {
         this.id = id;
     }
+    public boolean isGoodButton() {
+        return goodButton;
+    }
 
-    public Person(String id, String password, String name){
+    public void setGoodButton(boolean goodButton) {
+        this.goodButton = goodButton;
+    }
+
+    private boolean goodButton = false;
+        public Person(String id, String password, String name){
         this.id = id;
         this.password = password;
         this.name = name;

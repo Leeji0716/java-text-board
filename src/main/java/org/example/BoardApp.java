@@ -24,6 +24,7 @@ public class BoardApp {
                 case "search" -> boardManager.search();
                 case "signup" -> boardManager.signup();
                 case "login" -> boardManager.login();
+                case "logout" -> boardManager.logout();
 //                case "sort" -> boardManager.sort();
             }
         }

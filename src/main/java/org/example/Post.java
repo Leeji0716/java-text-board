@@ -1,8 +1,10 @@
 package org.example;
 
-public class Post {
-    int num;
+import java.util.ArrayList;
 
+public class Post {
+    CommonUtill commonUtill = new CommonUtill();
+    int num;
     public Person getPerson() {
         return person;
     }
@@ -12,11 +14,11 @@ public class Post {
     }
 
     public String getDate() {
-        return Date;
+        return date;
     }
 
     public void setDate(String date) {
-        Date = date;
+        this.date = date;
     }
 
     public int getHit() {
@@ -46,11 +48,48 @@ public class Post {
     private String title;
     private String body;
     private int hit; //조회수
-    private String Date;
-    private Person person = new Person();
     private String date;
+    private Person person = new Person();
+
+    public ArrayList<String> getComment() {
+        return Comment;
+    }
+
+    public void setComment(ArrayList<String> comment) {
+        Comment = comment;
+    }
+
+    ArrayList<String> Comment = new ArrayList<>();
+
+    public ArrayList<String> getCommentDate() {
+        return CommentDate;
+    }
+
+    public void setCommentDate(ArrayList<String> commentDate) {
+        CommentDate = commentDate;
+    }
+    private int good = 0;
+
+
+
+    public int getGood() {
+        return good;
+    }
+
+    public void setGood(int good) {
+        this.good = good;
+    }
+
+    ArrayList<String> CommentDate = new ArrayList<>();
 
     public Post(){
+    }
+    public int getNum() {
+        return num;
+    }
+
+    public void setNum(int num) {
+        this.num = num;
     }
 
     public Post(int num, String title, String body, Person person, String date){
@@ -61,11 +100,16 @@ public class Post {
         this.person = person;
         this.date = date;
     }
-    public int getNum() {
-        return num;
+    public void addComment(String comment, String commentDate){
+        Comment.add(comment);
+        CommentDate.add(commentDate);
     }
 
-    public void setNum(int num) {
-        this.num = num;
+    public void goodplus() {
+        this.good = this.good + 1;
+    }
+
+    public void goodminus() {
+        this.good = this.good - 1;
     }
 }

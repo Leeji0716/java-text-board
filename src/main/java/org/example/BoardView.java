@@ -1,6 +1,7 @@
 package org.example;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class BoardView {
     public void detailPost(Post post, Person person){
@@ -11,7 +12,14 @@ public class BoardView {
         System.out.println("등록날짜 : " + post.getDate());
         System.out.println("조회수 : " + post.getHit());
         System.out.println("===================");
-
+    }
+    public void commentPost(Post post, Person person){
+        for (int i = 0; i < post.getComment().size(); i++) {
+            System.out.println("===========댓글==========");
+            System.out.println(post.getComment().get(i));
+            System.out.println(post.getCommentDate().get(i));
+            System.out.println("========================");
+        }
     }
     public void PrintPostList(ArrayList<Post> targetList) {
         System.out.println("========================");

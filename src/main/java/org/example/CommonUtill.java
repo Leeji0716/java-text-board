@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 public class CommonUtill {
+    boolean ver = false;
 
     private Scanner scan = new Scanner(System.in);
     public Scanner getScanner() {

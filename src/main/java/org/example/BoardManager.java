@@ -9,11 +9,11 @@ public class BoardManager {
     BoardRepository boardRepository = new BoardRepository();
     BoardView boardView = new BoardView();
 
-
     Scanner scan = commonUtill.getScanner();
 
     Person indexPerson = null;
-    boolean ver = false;
+
+
 
 
 
@@ -25,7 +25,7 @@ public class BoardManager {
     }
 
     public void logcmd() {
-        if (ver){
+        if (indexPerson != null){
             System.out.print("명령어를 입력하세요[" + indexPerson.getId() + "(" + indexPerson.getName() + ")] : ");
         }
         else{
@@ -38,19 +38,15 @@ public class BoardManager {
         String id = scan.nextLine();
         System.out.print("비밀번호 : ");
         String password = scan.nextLine();
-
-        for (Person person : boardRepository.getPersonList()) {
-            if (person.getId().equals(id) && person.getPassword().equals(password)) {
-                indexPerson = person;
-                indexPerson.setLogin(true);
-                ver = indexPerson.isLogin();
-            }
-        }
+        indexPerson = boardRepository.logYN(id, password);
         if(indexPerson!=null){
             System.out.println(indexPerson.getName() + "님 환영합니다!");
             return;
         }
         System.out.println("비밀번호를 틀렸거나, 잘못된 회원정보입니다.");
+    }
+    public void logout(){
+        indexPerson = null;
     }
 
     public void signup() {
@@ -76,6 +72,64 @@ public class BoardManager {
         } else {
             System.out.println("존재하지 않는 게시물입니다.");
         }
+
+        while(indexPerson != null) {
+            System.out.print("상세보기 기능을 선택해주세요(1. 댓글 등록, 2. 추천, 3. 수정, 4. 삭제, 5. 목록으로) : ");
+            String detailNum = scan.nextLine();
+            if (detailNum.equals("1")) {
+                System.out.print("댓글 달기 : ");
+                String comment = scan.nextLine();
+                assert post != null;
+                post.addComment(comment, commonUtill.getCurrentDateTime());
+
+                boardView.detailPost(post, indexPerson);
+                boardView.commentPost(post, indexPerson);
+
+            } else if (detailNum.equals("2")) {
+                indexPerson.setGoodButton(!indexPerson.isGoodButton());
+                if (indexPerson.isGoodButton()){
+                    post.setGood(post.getGood() + 1);
+                }
+                else {
+                    post.setGood(post.getGood() - 1);
+                }
+                System.out.println("추천 갯수 : " + post.getGood());
+
+            } else if (detailNum.equals("3")) {
+                assert post != null;
+                if(post.getPerson().equals(indexPerson)){
+                    System.out.println("수정");
+                    updatePost(post);
+                }else {
+                    System.out.println("접근할 수 없습니다.");
+                }
+            } else if (detailNum.equals("4")) {
+                assert post != null;
+                if(post.getPerson().equals(indexPerson)){
+                    System.out.println("삭제");
+                    deletePost(post);
+                }else {
+                    System.out.println("접근할 수 없습니다.");
+                }
+            } else if (detailNum.equals("5")) {
+                System.out.println("상세보기 화면을 빠져나갑니다.");
+                break;
+            }
+        }
+    }
+
+    private void deletePost(Post post) {
+        boardRepository.deletePost(post);
+        System.out.println("게시물이 삭제되었습니다.");
+    }
+
+    private void updatePost(Post post) {
+        System.out.print("새로운 제목을 입력해주세요 : ");
+        String newTitle = scan.nextLine();
+        System.out.print("새로운 내용을 입력해주세요 : ");
+        String newBody = scan.nextLine();
+        boardRepository.updatePost(post, newTitle, newBody);
+        System.out.println("게시물이 수정되었습니다.");
     }
 
     public void search() {
@@ -87,30 +141,24 @@ public class BoardManager {
     }
 
     public void delete() {
-        if(ver){
+        if(indexPerson != null){
             System.out.print("삭제할 게시물 번호 : ");
             int num = Integer.parseInt(scan.nextLine());
             Post post = boardRepository.findPostNum(num);
-            boardRepository.deletePost(post);
-            System.out.println(num + "번 게시물이 삭제되었습니다.");
+            deletePost(post);
         }else {
             System.out.println("로그인 후 이용해주세요.");
         }
     }
 
     public void update() {
-        if(ver){
+        if(indexPerson != null){
             System.out.print("수정할 게시물 번호 : ");
             int num = Integer.parseInt(scan.nextLine());
             Post post = boardRepository.findPostNum(num);
 
             if (post != null) { //있다
-                System.out.print("새로운 제목을 입력해주세요 : ");
-                String newTitle = scan.nextLine();
-                System.out.print("새로운 내용을 입력해주세요 : ");
-                String newBody = scan.nextLine();
-                boardRepository.updatePost(post, newTitle, newBody);
-                System.out.printf("%d번 게시물이 수정되었습니다.\n", num);
+                updatePost(post);
             } else {
                 System.out.println("존재하지 않는 게시물입니다.");
             }
@@ -126,7 +174,7 @@ public class BoardManager {
     }
 
     public void add() {
-        if (ver){
+        if (indexPerson != null){
             System.out.print("제목을 입력하세요 : ");
             String title = scan.nextLine();
             System.out.print("내용을 입력하세요 : ");

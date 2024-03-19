@@ -26,6 +26,15 @@ public class BoardRepository {
     public void addPerson(String id, String password, String name){
         personList.add(new Person(id, password, name));
     }
+    public Person logYN(String id, String password){
+        for (Person person : getPersonList()) {
+            if (person.getId().equals(id) && person.getPassword().equals(password)) {
+                person.setLogin(true);
+                return person;
+            }
+        }
+        return null;
+    }
 
     public Post findPostNum(int num){
         for (int i = 0; i < postList.size(); i++) {
@@ -58,11 +67,9 @@ public class BoardRepository {
         postList.remove(post);
     }
     public ArrayList<Post> searchTitle(String keyword){
-
         return null;
     }
 
     public void sort(String target, String method){
-
     }
 }
