@@ -1,7 +1,8 @@
-package org.example;
+package org.example.domain;
+
+import org.example.base.CommonUtill;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class BoardManager {
@@ -13,15 +14,12 @@ public class BoardManager {
 
     Person indexPerson = null;
 
-
-
-
-
     private void sort() {
         System.out.println("정렬 대상을 선택해주세요 : (1. 번호, 2. 조회수");
         String sortTarget = scan.nextLine();
         System.out.println("정렬 방법을 선택해주세요 : (1.오름차순, 2.내림차순");
         String sortMathod = scan.nextLine();
+        boardRepository.sort(sortTarget, sortMathod);
     }
 
     public void logcmd() {
@@ -76,46 +74,57 @@ public class BoardManager {
         while(indexPerson != null) {
             System.out.print("상세보기 기능을 선택해주세요(1. 댓글 등록, 2. 추천, 3. 수정, 4. 삭제, 5. 목록으로) : ");
             String detailNum = scan.nextLine();
-            if (detailNum.equals("1")) {
-                System.out.print("댓글 달기 : ");
-                String comment = scan.nextLine();
-                assert post != null;
-                post.addComment(comment, commonUtill.getCurrentDateTime());
-
-                boardView.detailPost(post, indexPerson);
-                boardView.commentPost(post, indexPerson);
-
-            } else if (detailNum.equals("2")) {
-                indexPerson.setGoodButton(!indexPerson.isGoodButton());
-                if (indexPerson.isGoodButton()){
-                    post.setGood(post.getGood() + 1);
-                }
-                else {
-                    post.setGood(post.getGood() - 1);
-                }
-                System.out.println("추천 갯수 : " + post.getGood());
-
-            } else if (detailNum.equals("3")) {
-                assert post != null;
-                if(post.getPerson().equals(indexPerson)){
-                    System.out.println("수정");
-                    updatePost(post);
-                }else {
-                    System.out.println("접근할 수 없습니다.");
-                }
-            } else if (detailNum.equals("4")) {
-                assert post != null;
-                if(post.getPerson().equals(indexPerson)){
-                    System.out.println("삭제");
-                    deletePost(post);
-                }else {
-                    System.out.println("접근할 수 없습니다.");
-                }
-            } else if (detailNum.equals("5")) {
+            if (detailNum.equals("5")) {
                 System.out.println("상세보기 화면을 빠져나갑니다.");
                 break;
             }
+            switch (detailNum){
+                case "1" -> addComment(post);
+                case "2" -> goodComment(post);
+                case "3" -> updateComment(post, indexPerson);
+                case "4" -> deleteComment(post, indexPerson);
+            }
         }
+    }
+    private void deleteComment(Post post, Person indexPerson) {
+        assert post != null;
+        if(post.getPerson().equals(indexPerson)){
+            System.out.println("삭제");
+            deletePost(post);
+        }else {
+            System.out.println("접근할 수 없습니다.");
+        }
+    }
+
+    private void updateComment(Post post, Person indexPerson) {
+        assert post != null;
+        if(post.getPerson().equals(indexPerson)){
+            System.out.println("수정");
+            updatePost(post);
+        }else {
+            System.out.println("접근할 수 없습니다.");
+        }
+    }
+
+    private void goodComment(Post post) {
+        indexPerson.setGoodButton(!indexPerson.isGoodButton());
+        if (indexPerson.isGoodButton()){
+            post.setGood(post.getGood() + 1);
+        }
+        else {
+            post.setGood(post.getGood() - 1);
+        }
+        System.out.println("추천 갯수 : " + post.getGood());
+    }
+
+    private void addComment(Post post) {
+        System.out.print("댓글 달기 : ");
+        String comment = scan.nextLine();
+        assert post != null;
+        post.addComment(comment, commonUtill.getCurrentDateTime());
+
+        boardView.detailPost(post, indexPerson);
+        boardView.commentPost(post, indexPerson);
     }
 
     private void deletePost(Post post) {
@@ -166,13 +175,10 @@ public class BoardManager {
             System.out.println("로그인 후 이용해주세요.");
         }
     }
-
     public void list() {
         ArrayList<Post> postList = boardRepository.getPostList();
         boardView.PrintPostList(postList);
-
     }
-
     public void add() {
         if (indexPerson != null){
             System.out.print("제목을 입력하세요 : ");

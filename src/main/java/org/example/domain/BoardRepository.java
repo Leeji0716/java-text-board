@@ -1,6 +1,9 @@
-package org.example;
+package org.example.domain;
+
+import org.example.base.CommonUtill;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class BoardRepository {
@@ -11,18 +14,15 @@ public class BoardRepository {
     public BoardRepository(){
         TestData();
     }
-
     public void TestData(){
         Person test = new Person("manager", "manager","tester");
         addPost("안녕하세요. 반갑습니다. 자바 공부중이에요.", "body1",test);
         addPost("자바 질문좀 할게요~", "body2",test);
         addPost("정처기 따야 하나요?", "body3",test);
     }
-
     public ArrayList<Post> getPostList() {
         return postList;
     }
-
     public void addPerson(String id, String password, String name){
         personList.add(new Person(id, password, name));
     }
@@ -35,7 +35,6 @@ public class BoardRepository {
         }
         return null;
     }
-
     public Post findPostNum(int num){
         for (int i = 0; i < postList.size(); i++) {
             Post post = postList.get(i);
@@ -56,9 +55,6 @@ public class BoardRepository {
 
         return post;
     }
-    public void listPost(Post post){
-
-    }
     public void updatePost(Post post, String title, String body){
         post.setTitle(title);
         post.setBody(body);
@@ -69,7 +65,22 @@ public class BoardRepository {
     public ArrayList<Post> searchTitle(String keyword){
         return null;
     }
-
+    /*
     public void sort(String target, String method){
-    }
+        if (method.equals("1")){ //오름차순
+            Collections.sort(postList);
+        }else if (method.equals("2")){ //내림차순
+
+        }else {
+            System.out.println("다시입력하세요.");;
+        }
+    }*/
 }
+//public void PrintPostList(ArrayList<Post> targetList) {
+//    System.out.println("========================");
+//    for (Post post : targetList) {
+//        System.out.println("번호 : " + post.getNum());
+//        System.out.println("제목 : " + post.getTitle());
+//        System.out.println("========================");
+//    }
+//}

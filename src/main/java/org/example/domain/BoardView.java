@@ -1,7 +1,6 @@
-package org.example;
+package org.example.domain;
 
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class BoardView {
     public void detailPost(Post post, Person person){

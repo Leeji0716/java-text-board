@@ -1,6 +1,7 @@
-package org.example;
+package org.example.base;
 
-import java.util.List;
+import org.example.domain.BoardManager;
+
 import java.util.Scanner;
 
 public class BoardApp {
